@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100vh;
-  text-align: center;
+  text-align: left;
 }
 
 .App-header {
@@ -11,7 +11,7 @@
   overflow: visible;
   width: 100%;
   text-align: center;
-  color: white;
+  color: #ffffff;
 }
 
 .messages-list {
