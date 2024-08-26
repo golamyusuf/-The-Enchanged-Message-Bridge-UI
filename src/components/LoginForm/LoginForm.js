@@ -12,7 +12,7 @@ const LoginForm = ({ onSubmit }) => {
     }
 
     return (
-        <div>
+        <div className="login-form-container">
             <TextField
                 label="Type your username"
                 placeholder="Username"

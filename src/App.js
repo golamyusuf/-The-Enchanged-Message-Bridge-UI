@@ -6,6 +6,7 @@ import LoginForm from './components/LoginForm';
 import Messages from './components/Messages/Messages';
 import chatAPI from './services/chatapi';
 import { randomColor } from './utils/common';
+import ConnectedUsers from './components/ConnectedUsers/ConnectedUsers';
 
 const SOCKET_URL = 'http://localhost:8080/ws-chat/';
 
@@ -14,7 +15,6 @@ const App = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Fetch all messages when the component mounts
     chatAPI.getMessages()
       .then(response => {
         setMessages(response.data);
@@ -24,16 +24,16 @@ const App = () => {
       });
   }, []);
 
-  let onConnected = () => {
+  const onConnected = () => {
     console.log("Connected!!");
-  }
+  };
 
-  let onMessageReceived = (msg) => {
+  const onMessageReceived = (msg) => {
     console.log('New Message Received!!', msg);
-    setMessages(messages.concat(msg));
-  }
+    setMessages(prevMessages => [...prevMessages, msg]);
+  };
 
-  let onSendMessage = (msgText, file) => {
+  const onSendMessage = (msgText, file) => {
     const formData = new FormData();
     formData.append('sender', user.username);
     formData.append('content', msgText);
@@ -45,46 +45,49 @@ const App = () => {
     chatAPI.sendMessage(formData)
       .then(res => {
         console.log('Sent', res);
-        // Optionally, you might want to refresh the message list after sending a message
-        // chatAPI.getMessages().then(response => setMessages(response.data));
       })
       .catch(err => {
-        console.log('Error Occurred while sending message to API', err);
+        console.log('Error occurred while sending message to API', err);
       });
-  }
+  };
 
-  let handleLoginSubmit = (username) => {
+  const handleLoginSubmit = (username) => {
     console.log(username, " Logged in..");
-
     setUser({
       username: username,
       color: randomColor()
-    })
-  }
+    });
+  };
 
   return (
     <div className="App">
       {!!user ?
         (
-          <>
-            <div className="user-info">
-              <h2>Logged in as: {user.username}</h2>
-            </div>
-            <SockJsClient
-              url={SOCKET_URL}
-              topics={['/topic/group']}
-              onConnect={onConnected}
-              onDisconnect={console.log("Disconnected!")}
-              onMessage={msg => onMessageReceived(msg)}
-              debug={false}
-            />
-           
-            <Messages
-              messages={messages}
-              currentUser={user}
-            />
-            <Input onSendMessage={onSendMessage} />
-          </>
+          <div className="app-container">
+            <aside className="sidebar">
+              <ConnectedUsers username={user.username}/>
+            </aside>
+            <main className="main-content">
+              <div className="banner-info">
+              <h3>Welcome to the Enchanted Message Bridge</h3>
+                <h4>Logged in as: {user.username}</h4>
+              </div>
+             
+              <SockJsClient
+                url={SOCKET_URL}
+                topics={['/topic/group']}
+                onConnect={onConnected}
+                onDisconnect={() => console.log("Disconnected!")}
+                onMessage={msg => onMessageReceived(msg)}
+                debug={false}
+              />
+              <Messages
+                messages={messages}
+                currentUser={user}
+              />
+              <Input onSendMessage={onSendMessage} />
+            </main>
+          </div>
         ) :
         <LoginForm onSubmit={handleLoginSubmit} />
       }
@@ -93,4 +96,3 @@ const App = () => {
 }
 
 export default App;
- 
