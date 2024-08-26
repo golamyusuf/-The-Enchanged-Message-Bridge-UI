@@ -90,3 +90,12 @@
   flex-grow: 1;
 }
 
+.user-info {
+  text-align: center;
+  margin-bottom: 20px;
+  background-color: aqua;
+}
+
+.user-info h2 {
+  color: #7c4d26;
+}
